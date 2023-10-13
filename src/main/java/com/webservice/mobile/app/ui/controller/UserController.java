@@ -1,6 +1,7 @@
 package com.webservice.mobile.app.ui.controller;
 
 import com.webservice.mobile.app.exceptions.UserServiceException;
+import com.webservice.mobile.app.security.SecurityConstants;
 import com.webservice.mobile.app.service.UserService;
 import com.webservice.mobile.app.shared.dto.UserDTO;
 import com.webservice.mobile.app.ui.model.request.UserDetailsRequestModel;
@@ -13,7 +14,9 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -25,7 +28,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
-
+      
+    final static String afterResetPassword=SecurityConstants.afterResetPassword;
+    
     @ApiOperation(value = "The Get User Details Web Service Endpoint",
     notes = "This Web Service Endpoint returns User Details. User public user id in URL path." +
             "For Example: /user/<User Id here>")
@@ -117,6 +122,18 @@ public class UserController {
 
         return returnValue;
     }
+   
+    @PostMapping(path = "/reset/{id}")
+    public ResponseEntity<Object> resetPassword(@PathVariable String id){
+    	
+        Boolean isPasswordReseted=userService.resetPassword(id,afterResetPassword);   
+       if(isPasswordReseted){        
+    	   return new ResponseEntity<>(HttpStatus.OK);
+       }else{
+    	   return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+       }
+    }
+
 
 
 }
